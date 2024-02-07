@@ -19,6 +19,7 @@ var conf *ApplicationConfig
 type ApplicationConfig struct {
 	Server   Server   `mapstructure:"server"`
 	Postgres DBConfig `mapstructure:"postgres"`
+	JWT      JWT      `mapstructure:"jwt"`
 }
 
 type Server struct {
@@ -38,6 +39,12 @@ type DBConfig struct {
 type ServerConfig struct {
 	Addr    string `mapstructure:"addr"`
 	Timeout int    `mapstructure:"timeout"`
+}
+
+type JWT struct {
+	PrivateKey    string `mapstructure:"private_key"`
+	PublicKey     string `mapstructure:"public_key"`
+	ExpiresSecond int    `mapstructure:"expires_second"`
 }
 
 var basepath string

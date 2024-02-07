@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	User_CreateUser_FullMethodName = "/api.v1.User/CreateUser"
+	User_CreateUser_FullMethodName      = "/api.v1.User/CreateUser"
+	User_CreateUserToken_FullMethodName = "/api.v1.User/CreateUserToken"
 )
 
 // UserClient is the client API for User service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	CreateUserToken(ctx context.Context, in *CreateUserTokenRequest, opts ...grpc.CallOption) (*CreateUserTokenResponse, error)
 }
 
 type userClient struct {
@@ -46,11 +48,21 @@ func (c *userClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts
 	return out, nil
 }
 
+func (c *userClient) CreateUserToken(ctx context.Context, in *CreateUserTokenRequest, opts ...grpc.CallOption) (*CreateUserTokenResponse, error) {
+	out := new(CreateUserTokenResponse)
+	err := c.cc.Invoke(ctx, User_CreateUserToken_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
 type UserServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	CreateUserToken(context.Context, *CreateUserTokenRequest) (*CreateUserTokenResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -60,6 +72,9 @@ type UnimplementedUserServer struct {
 
 func (UnimplementedUserServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (UnimplementedUserServer) CreateUserToken(context.Context, *CreateUserTokenRequest) (*CreateUserTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUserToken not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -92,6 +107,24 @@ func _User_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_CreateUserToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).CreateUserToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_CreateUserToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).CreateUserToken(ctx, req.(*CreateUserTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +135,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateUser",
 			Handler:    _User_CreateUser_Handler,
+		},
+		{
+			MethodName: "CreateUserToken",
+			Handler:    _User_CreateUserToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

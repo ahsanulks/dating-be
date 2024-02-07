@@ -15,6 +15,13 @@ service User {
 			body: "*"
 		};
 	};
+
+	rpc CreateUserToken (CreateUserTokenRequest) returns (CreateUserTokenResponse) {
+		option (google.api.http) = {
+			post: "/api/v1/users/token"
+			body: "*"
+		};	
+	}
 }
 
 message CreateUserRequest {
@@ -26,4 +33,15 @@ message CreateUserRequest {
 }
 message CreateUserResponse {
 	int64 id = 1;
+}
+
+message CreateUserTokenRequest {
+	string username = 1;
+	string password = 2;
+}
+
+message CreateUserTokenResponse {
+	string token = 1;
+	string type = 2;
+	int32 expires_in = 3;
 }

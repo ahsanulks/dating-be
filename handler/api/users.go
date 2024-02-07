@@ -32,10 +32,27 @@ func (h UserApiHandler) CreateUser(ctx context.Context, params *v1.CreateUserReq
 		Gender:      params.Gender,
 	})
 	if err != nil {
-		log.Error(err)
+		h.log.Log(log.LevelError, err)
 		return nil, err
 	}
 	return &v1.CreateUserResponse{
 		Id: userID,
+	}, nil
+}
+
+func (h UserApiHandler) CreateUserToken(ctx context.Context, params *v1.CreateUserTokenRequest) (*v1.CreateUserTokenResponse, error) {
+	token, err := h.userWriter.GenerateUserToken(ctx, &request.GenerateUserToken{
+		Username: params.Username,
+		Password: params.Password,
+	})
+
+	if err != nil {
+		h.log.Log(log.LevelError, err)
+		return nil, err
+	}
+	return &v1.CreateUserTokenResponse{
+		Token:     token.Token,
+		Type:      token.Type,
+		ExpiresIn: int32(token.ExpiresIn),
 	}, nil
 }

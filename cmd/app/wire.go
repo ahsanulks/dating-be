@@ -11,6 +11,8 @@ import (
 	"app/infra"
 	"app/infra/database"
 	"app/infra/encryption"
+	tokenprovider "app/infra/token_provider"
+	"app/internal/user/entity"
 	"app/internal/user/port/driven"
 	"app/internal/user/port/driver"
 	"app/internal/user/usecase"
@@ -32,6 +34,8 @@ func wireApp(*configs.ApplicationConfig, *configs.DBConfig, log.Logger) (*kratos
 			usecase.NewUserWriterUsecase,
 			wire.Bind(new(driven.Encyptor), new(*encryption.BcryptEncryption)),
 			wire.Bind(new(driven.UserWriter), new(*database.UserRepository)),
+			wire.Bind(new(driven.UserGetter), new(*database.UserRepository)),
+			wire.Bind(new(driven.TokenProvider[*entity.User]), new(*tokenprovider.UserJwtProvider)),
 			wire.Bind(new(driver.UserWriterUsecase), new(*usecase.UserWriterUsecase)),
 		),
 	)

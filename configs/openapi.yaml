@@ -3,7 +3,7 @@
 
 openapi: 3.0.3
 info:
-    title: ""
+    title: User API
     version: 0.0.1
 paths:
     /api/v1/users:
@@ -24,25 +24,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.v1.CreateUserResponse'
-    /helloworld/{name}:
-        get:
+    /api/v1/users/token:
+        post:
             tags:
-                - Greeter
-            description: Sends a greeting
-            operationId: Greeter_SayHello
-            parameters:
-                - name: name
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - User
+            operationId: User_CreateUserToken
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.v1.CreateUserTokenRequest'
+                required: true
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+                                $ref: '#/components/schemas/api.v1.CreateUserTokenResponse'
 components:
     schemas:
         api.v1.CreateUserRequest:
@@ -63,13 +62,22 @@ components:
             properties:
                 id:
                     type: string
-        helloworld.v1.HelloReply:
+        api.v1.CreateUserTokenRequest:
             type: object
             properties:
-                message:
+                username:
                     type: string
-            description: The response message containing the greetings
+                password:
+                    type: string
+        api.v1.CreateUserTokenResponse:
+            type: object
+            properties:
+                token:
+                    type: string
+                type:
+                    type: string
+                expiresIn:
+                    type: integer
+                    format: int32
 tags:
-    - name: Greeter
-      description: The greeting service definition.
     - name: User

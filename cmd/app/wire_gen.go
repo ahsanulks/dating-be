@@ -11,6 +11,7 @@ import (
 	"app/handler/api"
 	"app/infra/database"
 	"app/infra/encryption"
+	"app/infra/token_provider"
 	"app/internal/user/usecase"
 	"app/server"
 	"github.com/go-kratos/kratos/v2"
@@ -29,7 +30,8 @@ func wireApp(applicationConfig *configs.ApplicationConfig, dbConfig *configs.DBC
 	postgresDB, cleanup := database.NewPostgresDB(dbConfig, logger)
 	userRepository := database.NewUserRepository(postgresDB)
 	bcryptEncryption := encryption.NewBcryptEncryption()
-	userWriterUsecase := usecase.NewUserWriterUsecase(userRepository, bcryptEncryption)
+	userJwtProvider := tokenprovider.NewUserJwtProvider(applicationConfig)
+	userWriterUsecase := usecase.NewUserWriterUsecase(userRepository, bcryptEncryption, userRepository, userJwtProvider)
 	userApiHandler := api.NewUserApiHandler(userWriterUsecase, logger)
 	httpServer := server.NewHTTPServer(applicationConfig, userApiHandler, logger)
 	app := newApp(logger, grpcServer, httpServer)

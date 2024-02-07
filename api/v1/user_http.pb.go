@@ -20,14 +20,17 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationUserCreateUser = "/api.v1.User/CreateUser"
+const OperationUserCreateUserToken = "/api.v1.User/CreateUserToken"
 
 type UserHTTPServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	CreateUserToken(context.Context, *CreateUserTokenRequest) (*CreateUserTokenResponse, error)
 }
 
 func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r := s.Route("/")
 	r.POST("/api/v1/users", _User_CreateUser0_HTTP_Handler(srv))
+	r.POST("/api/v1/users/token", _User_CreateUserToken0_HTTP_Handler(srv))
 }
 
 func _User_CreateUser0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -52,8 +55,31 @@ func _User_CreateUser0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) e
 	}
 }
 
+func _User_CreateUserToken0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateUserTokenRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserCreateUserToken)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateUserToken(ctx, req.(*CreateUserTokenRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateUserTokenResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserHTTPClient interface {
 	CreateUser(ctx context.Context, req *CreateUserRequest, opts ...http.CallOption) (rsp *CreateUserResponse, err error)
+	CreateUserToken(ctx context.Context, req *CreateUserTokenRequest, opts ...http.CallOption) (rsp *CreateUserTokenResponse, err error)
 }
 
 type UserHTTPClientImpl struct {
@@ -69,6 +95,19 @@ func (c *UserHTTPClientImpl) CreateUser(ctx context.Context, in *CreateUserReque
 	pattern := "/api/v1/users"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserCreateUser))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) CreateUserToken(ctx context.Context, in *CreateUserTokenRequest, opts ...http.CallOption) (*CreateUserTokenResponse, error) {
+	var out CreateUserTokenResponse
+	pattern := "/api/v1/users/token"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserCreateUserToken))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

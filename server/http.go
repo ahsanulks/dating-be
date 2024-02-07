@@ -35,7 +35,7 @@ func NewHTTPServer(c *configs.ApplicationConfig, userHandler *api.UserApiHandler
 		opts = append(opts, http.Address(c.Server.HTTP.Addr))
 	}
 	if c.Server.HTTP.Timeout != 0 {
-		opts = append(opts, http.Timeout(time.Duration(c.Server.HTTP.Timeout)))
+		opts = append(opts, http.Timeout(time.Duration(c.Server.HTTP.Timeout)*time.Second))
 	}
 	srv := http.NewServer(opts...)
 	v1.RegisterUserHTTPServer(srv, userHandler)

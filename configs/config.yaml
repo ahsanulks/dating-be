@@ -1,12 +1,15 @@
 server:
   http:
     addr: 0.0.0.0:8000
-    timeout: 1
+    timeout: 60
   grpc:
     addr: 0.0.0.0:9000
-    timeout: 1
-
+    timeout: 60
 # will get value from env
+jwt:
+  private_key:
+  public_key:
+  expires_second:
 postgres:
   hostname: 
   port: 
