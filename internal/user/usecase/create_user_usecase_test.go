@@ -9,10 +9,10 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"regexp"
 	"sort"
 	"strings"
 	"testing"
+	"unicode"
 
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
@@ -242,7 +242,8 @@ func TestUserUsecase_CreateUser(t *testing.T) {
 			assert := assert.New(t)
 			if tt.wantErr {
 				assert.Error(err)
-				assert.True(assertMessagesEqual(tt.wantErrMsg, err.Error()))
+				wantErrMsg, expectedErrMsg := sortErrorMessage(tt.wantErrMsg, err.Error())
+				assert.Equal(wantErrMsg, expectedErrMsg)
 			} else {
 				gotUser, err := fakeUserDriven.GetByID(tt.args.ctx, gotID)
 				assert.NoError(err)
@@ -262,11 +263,11 @@ func splitAndSortErrorMessage(message string) []string {
 	return slicedMessages
 }
 
-func assertMessagesEqual(message1, message2 string) bool {
+func sortErrorMessage(message1, message2 string) (string, string) {
 	sorted1 := splitAndSortErrorMessage(message1)
 	sorted2 := splitAndSortErrorMessage(message2)
 
-	return fmt.Sprintf("%v", sorted1) == fmt.Sprintf("%v", sorted2)
+	return fmt.Sprintf("%v", sorted1), fmt.Sprintf("%v", sorted2)
 }
 
 func TestCreateUser_withPasswordEncrypted(t *testing.T) {
@@ -276,9 +277,11 @@ func TestCreateUser_withPasswordEncrypted(t *testing.T) {
 	assert := assert.New(t)
 
 	userParam := &request.CreateUser{
+		Username:    "Ads123d-s123-_",
 		PhoneNumber: "+628123123123",
 		Name:        faker.Name(),
 		Password:    generateRandomPassword(12),
+		Gender:      "FEMALE",
 	}
 	gotID, err := uu.CreateUser(context.Background(), userParam)
 	assert.NoError(err)
@@ -309,13 +312,33 @@ func generateRandomString(length int, charset string) string {
 
 func generateRandomPassword(length int) string {
 	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:'\",.<>/?~"
-	passwordRegex := regexp.MustCompile(`^(.*[A-Z])(.*\d)(.*[^A-Za-z0-9])`)
 	var password string
 	match := false
 	for !match {
 		password = generateRandomString(length, charset)
-		match = passwordRegex.MatchString(password)
+		match = strongPassword(password)
 	}
 
 	return password
+}
+
+func strongPassword(password string) bool {
+	hasCapital := false
+	hasLowercase := false
+	hasNumber := false
+	hasSpecialChar := false
+
+	for _, char := range password {
+		if unicode.IsUpper(char) {
+			hasCapital = true
+		} else if unicode.IsLower(char) {
+			hasLowercase = true
+		} else if unicode.IsDigit(char) {
+			hasNumber = true
+		} else if char >= 33 && char <= 47 || char >= 58 && char <= 64 || char >= 91 && char <= 96 || char >= 123 && char <= 126 {
+			hasSpecialChar = true
+		}
+	}
+
+	return hasCapital && hasLowercase && hasNumber && hasSpecialChar
 }
