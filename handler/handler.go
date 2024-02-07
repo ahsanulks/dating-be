@@ -1,6 +1,10 @@
 package handler
 
-import "github.com/google/wire"
+import (
+	"app/handler/api"
+
+	"github.com/google/wire"
+)
 
 // ProviderSet is handler providers.
-var ProviderSet = wire.NewSet()
+var ProviderSet = wire.NewSet(api.NewUserApiHandler)

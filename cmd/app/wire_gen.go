@@ -8,6 +8,10 @@ package main
 
 import (
 	"app/configs"
+	"app/handler/api"
+	"app/infra/database"
+	"app/infra/encryption"
+	"app/internal/user/usecase"
 	"app/server"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
@@ -22,8 +26,14 @@ import (
 // wireApp init kratos application.
 func wireApp(applicationConfig *configs.ApplicationConfig, dbConfig *configs.DBConfig, logger log.Logger) (*kratos.App, func(), error) {
 	grpcServer := server.NewGRPCServer(applicationConfig, logger)
-	httpServer := server.NewHTTPServer(applicationConfig, logger)
+	postgresDB, cleanup := database.NewPostgresDB(dbConfig, logger)
+	userRepository := database.NewUserRepository(postgresDB)
+	bcryptEncryption := encryption.NewBcryptEncryption()
+	userWriterUsecase := usecase.NewUserWriterUsecase(userRepository, bcryptEncryption)
+	userApiHandler := api.NewUserApiHandler(userWriterUsecase, logger)
+	httpServer := server.NewHTTPServer(applicationConfig, userApiHandler, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
+		cleanup()
 	}, nil
 }

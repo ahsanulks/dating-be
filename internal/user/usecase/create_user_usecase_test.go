@@ -20,7 +20,7 @@ import (
 
 func TestUserUsecase_CreateUser(t *testing.T) {
 	fakeUserDriven := fake.NewFakeUserDriven()
-	bcrypt := new(encryption.BcyrpEncryption)
+	bcrypt := new(encryption.BcryptEncryption)
 	type args struct {
 		ctx   context.Context
 		param *request.CreateUser
@@ -237,7 +237,7 @@ func TestUserUsecase_CreateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			uu := usecase.NewUserUsecase(fakeUserDriven, bcrypt)
+			uu := usecase.NewUserWriterUsecase(fakeUserDriven, bcrypt)
 			gotID, err := uu.CreateUser(tt.args.ctx, tt.args.param)
 			assert := assert.New(t)
 			if tt.wantErr {
@@ -272,8 +272,8 @@ func sortErrorMessage(message1, message2 string) (string, string) {
 
 func TestCreateUser_withPasswordEncrypted(t *testing.T) {
 	fakeUserDriven := fake.NewFakeUserDriven()
-	bcrypt := new(encryption.BcyrpEncryption)
-	uu := usecase.NewUserUsecase(fakeUserDriven, bcrypt)
+	bcrypt := new(encryption.BcryptEncryption)
+	uu := usecase.NewUserWriterUsecase(fakeUserDriven, bcrypt)
 	assert := assert.New(t)
 
 	userParam := &request.CreateUser{

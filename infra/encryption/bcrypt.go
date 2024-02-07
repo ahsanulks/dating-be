@@ -6,14 +6,18 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var _ driven.Encyptor = new(BcyrpEncryption)
+var _ driven.Encyptor = new(BcryptEncryption)
 
-type BcyrpEncryption struct{}
+type BcryptEncryption struct{}
 
-func (*BcyrpEncryption) Encrypt(data []byte, cost int) ([]byte, error) {
+func NewBcryptEncryption() *BcryptEncryption {
+	return &BcryptEncryption{}
+}
+
+func (*BcryptEncryption) Encrypt(data []byte, cost int) ([]byte, error) {
 	return bcrypt.GenerateFromPassword(data, cost)
 }
 
-func (*BcyrpEncryption) CompareEncryptedAndData(encrypted, data []byte) error {
+func (*BcryptEncryption) CompareEncryptedAndData(encrypted, data []byte) error {
 	return bcrypt.CompareHashAndPassword(encrypted, data)
 }

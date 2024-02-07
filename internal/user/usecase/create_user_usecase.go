@@ -10,7 +10,7 @@ const (
 	costEncryption = 10
 )
 
-func (uu UserUsecase) CreateUser(ctx context.Context, params *request.CreateUser) (id int64, err error) {
+func (uu UserWriterUsecase) CreateUser(ctx context.Context, params *request.CreateUser) (id int64, err error) {
 	user, err := entity.NewUser(params)
 	if err != nil {
 		return id, err

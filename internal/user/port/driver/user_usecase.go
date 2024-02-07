@@ -5,6 +5,6 @@ import (
 	"context"
 )
 
-type UserUsecase interface {
+type UserWriterUsecase interface {
 	CreateUser(ctx context.Context, params *request.CreateUser) (id int64, err error)
 }

@@ -4,16 +4,16 @@ import (
 	"app/internal/user/port/driven"
 )
 
-type UserUsecase struct {
+type UserWriterUsecase struct {
 	userWriter driven.UserWriter
 	encryptor  driven.Encyptor
 }
 
-func NewUserUsecase(
+func NewUserWriterUsecase(
 	userWriter driven.UserWriter,
 	encryptor driven.Encyptor,
-) *UserUsecase {
-	return &UserUsecase{
+) *UserWriterUsecase {
+	return &UserWriterUsecase{
 		userWriter: userWriter,
 		encryptor:  encryptor,
 	}
