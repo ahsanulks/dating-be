@@ -1,9 +1,7 @@
 package server
 
 import (
-	v1 "app/api/helloworld/v1"
 	"app/configs"
-	"app/internal/service"
 	"embed"
 	"io/fs"
 	nethttp "net/http"
@@ -19,7 +17,7 @@ import (
 var content embed.FS
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *configs.ApplicationConfig, greeter *service.GreeterService, logger log.Logger) *http.Server {
+func NewHTTPServer(c *configs.ApplicationConfig, logger log.Logger) *http.Server {
 	// func NewHTTPServer(c *configs.ApplicationConfig, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
@@ -33,7 +31,6 @@ func NewHTTPServer(c *configs.ApplicationConfig, greeter *service.GreeterService
 		opts = append(opts, http.Timeout(time.Duration(c.Server.HTTP.Timeout)))
 	}
 	srv := http.NewServer(opts...)
-	v1.RegisterGreeterHTTPServer(srv, greeter)
 	openAPIhandler := handleSwaggerUI(configs.OpenAPI)
 	srv.HandlePrefix("/q/", openAPIhandler)
 	return srv
