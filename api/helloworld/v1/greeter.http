@@ -1,0 +1,11 @@
+GET {{host}}/helloworld/nameTesting
+
+###
+
+POST https://example.com/comments
+content-type: application/json
+
+{
+    "name": "sample",
+    "time": "Wed, 21 Oct 2015 18:27:50 GMT"
+}
