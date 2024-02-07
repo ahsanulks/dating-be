@@ -24,6 +24,7 @@ init:
 	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 	go install github.com/google/wire/cmd/wire@latest
+	go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen@latest
 
 .PHONY: config
 # generate internal proto
@@ -44,6 +45,8 @@ api:
 		   --openapi_out=fq_schema_naming=true,enum_type=string,default_response=false:./configs \
 	       $(API_PROTO_FILES)
 
+	oapi-codegen -package client configs/openapi.yaml > tests/client/openapi.gen.go
+
 .PHONY: build
 # build
 build:
@@ -57,7 +60,16 @@ generate:
 	go generate ./...
 
 test:
-	go test ./... -race
+	mkdir -p bin/ && go build -cover -covermode=count -coverpkg=./... -o ./bin/ ./...
+    # Run the built binary in the background
+	./bin/app &
+    # Wait a moment to ensure the binary has started
+	sleep 1
+    # Run the tests
+	go test ./... -count=2
+	sleep 1
+    # Find and kill the background process
+	kill `pgrep -f ./bin/app` || true
 
 .PHONY: all
 # generate all
