@@ -2,27 +2,24 @@ package database
 
 import (
 	"app/configs"
-	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/jackc/pgx/v5/pgxpool"
+	_ "github.com/lib/pq"
 )
 
 type PostgresDB struct {
-	conn *pgxpool.Pool
+	conn *sql.DB
 }
 
 func NewPostgresDB(c *configs.DBConfig, logger log.Logger) (*PostgresDB, func()) {
 	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s", c.User, c.Password, c.Hostname, c.Port, c.DB)
-	conn, err := pgxpool.New(
-		context.Background(),
-		dsn,
-	)
+	conn, err := sql.Open("postgres", dsn)
 	if err != nil {
 		panic("cannot connect to db")
 	}
-	if err := conn.Ping(context.TODO()); err != nil {
+	if err := conn.Ping(); err != nil {
 		panic("cannot ping db")
 	}
 	logger.Log(log.LevelInfo, "msg", "connecting to db")
@@ -35,6 +32,6 @@ func NewPostgresDB(c *configs.DBConfig, logger log.Logger) (*PostgresDB, func())
 	}, cleanup
 }
 
-func (db *PostgresDB) Conn() *pgxpool.Pool {
+func (db *PostgresDB) Conn() *sql.DB {
 	return db.conn
 }

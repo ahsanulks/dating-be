@@ -181,3 +181,12 @@ func (g Gender) fromString(value string) Gender {
 	}
 	return genderUnknown
 }
+
+func (g Gender) String() string {
+	if g == genderMale {
+		return "male"
+	} else if g == genderFemale {
+		return "female"
+	}
+	return ""
+}
