@@ -7,4 +7,5 @@ import (
 
 type UserWriter interface {
 	Create(ctx context.Context, user *entity.User) (id int64, err error)
+	UpdateLoginInformation(ctx context.Context, user *entity.User) error
 }

@@ -7,3 +7,8 @@ type CreateUser struct {
 	Password    string
 	Gender      string
 }
+
+type GenerateUserToken struct {
+	Username string
+	Password string
+}

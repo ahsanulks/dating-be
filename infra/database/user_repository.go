@@ -32,3 +32,8 @@ func (ur *UserRepository) Create(ctx context.Context, user *entity.User) (id int
 	`, user.Username, user.Name, user.Gender.String(), user.PhoneNumber, user.Password).Scan(&id)
 	return
 }
+
+// UpdateLoginInformation implements driven.UserWriter.
+func (*UserRepository) UpdateLoginInformation(ctx context.Context, user *entity.User) error {
+	panic("unimplemented")
+}
