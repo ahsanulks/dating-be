@@ -56,6 +56,9 @@ generate:
 	go get github.com/google/wire/cmd/wire@latest
 	go generate ./...
 
+test:
+	go test ./... -race
+
 .PHONY: all
 # generate all
 all:
