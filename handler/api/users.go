@@ -32,7 +32,7 @@ func (h UserApiHandler) CreateUser(ctx context.Context, params *v1.CreateUserReq
 		Gender:      params.Gender,
 	})
 	if err != nil {
-		h.log.Log(log.LevelError, err)
+		_ = h.log.Log(log.LevelError, err)
 		return nil, err
 	}
 	return &v1.CreateUserResponse{
@@ -47,7 +47,7 @@ func (h UserApiHandler) CreateUserToken(ctx context.Context, params *v1.CreateUs
 	})
 
 	if err != nil {
-		h.log.Log(log.LevelError, err)
+		_ = h.log.Log(log.LevelError, err)
 		return nil, err
 	}
 	return &v1.CreateUserTokenResponse{

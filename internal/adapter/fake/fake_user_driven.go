@@ -15,6 +15,8 @@ var (
 	_ driven.UserGetter = new(FakeUserDriven)
 )
 
+type ContextType string
+
 type FakeUserDriven struct {
 	data           map[int64]*entity.User
 	dataByUsername map[string]*entity.User
@@ -42,7 +44,7 @@ func (fud FakeUserDriven) GetByID(ctx context.Context, id int64) (*entity.User, 
 }
 
 func (*FakeUserDriven) UpdateLoginInformation(ctx context.Context, user *entity.User) error {
-	if val := ctx.Value("token_error"); val != nil {
+	if val := ctx.Value(ContextType("token_error")); val != nil {
 		return errors.New("error")
 	}
 	return nil

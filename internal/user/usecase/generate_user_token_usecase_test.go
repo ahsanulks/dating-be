@@ -24,14 +24,18 @@ func TestUserWriterUsecase_GenerateUsertoken(t *testing.T) {
 		Name:     faker.Name(),
 		Password: string(encryptedPassword),
 	}
-	fakeUserDriven.Create(context.Background(), user)
+
+	assert := assert.New(t)
+	_, err := fakeUserDriven.Create(context.Background(), user)
+	assert.NoError(err)
 
 	invalidUser := &entity.User{
 		Username: "wrongUsername",
 		Name:     faker.Name(),
 		Password: string(encryptedPassword),
 	}
-	fakeUserDriven.Create(context.Background(), invalidUser)
+	_, err = fakeUserDriven.Create(context.Background(), invalidUser)
+	assert.NoError(err)
 
 	type args struct {
 		ctx    context.Context
@@ -82,7 +86,7 @@ func TestUserWriterUsecase_GenerateUsertoken(t *testing.T) {
 		{
 			name: "when error record last login count, it should return token",
 			args: args{
-				context.WithValue(context.Background(), "token_error", true),
+				context.WithValue(context.Background(), fake.ContextType("token_error"), true),
 				&request.GenerateUserToken{
 					Username: user.Username,
 					Password: validPassword,
@@ -112,7 +116,7 @@ func TestUserWriterUsecase_GenerateUsertoken(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			uu := usecase.NewUserWriterUsecase(fakeUserDriven, new(encryption.BcryptEncryption), fakeUserDriven, new(fake.FakeTokenProvider))
 			result, err := uu.GenerateUserToken(tt.args.ctx, tt.args.params)
-			assert := assert.New(t)
+
 			assert.Equal(tt.wantErr, err != nil)
 			assert.Equal(tt.want, result)
 		})

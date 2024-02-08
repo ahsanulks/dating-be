@@ -23,10 +23,10 @@ func NewPostgresDB(c *configs.DBConfig, logger log.Logger) (*PostgresDB, func())
 		fmt.Println(err)
 		panic("cannot ping db")
 	}
-	logger.Log(log.LevelInfo, "msg", "connecting to db")
+	_ = logger.Log(log.LevelInfo, "msg", "connecting to db")
 	cleanup := func() {
-		logger.Log(log.LevelInfo, "msg", "closing db connection")
-		conn.Close()
+		_ = logger.Log(log.LevelInfo, "msg", "closing db connection")
+		_ = conn.Close()
 	}
 	return &PostgresDB{
 		conn: conn,

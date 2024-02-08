@@ -28,7 +28,7 @@ func ErrorFormatter(w http.ResponseWriter, r *http.Request, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	// Set HTTP Status Code
 	w.WriteHeader(code)
-	w.Write(body)
+	_, _ = w.Write(body)
 }
 
 func parseValidationError(err *customerror.ValidationError) (int, ErrorResponse) {
