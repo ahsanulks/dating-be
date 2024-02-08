@@ -3,47 +3,144 @@ package integration
 import (
 	"app/tests/client"
 	"context"
-	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateUser(t *testing.T) {
 	username := generateUsername(10)
 	password := generatePassword(20)
-	resp, err := openApiClient.UserCreateUser(context.Background(), client.UserCreateUserJSONRequestBody{
-		Gender:      strToPtr("male"),
-		Name:        strToPtr(faker.Name()),
-		Password:    strToPtr(password),
-		PhoneNumber: strToPtr(generatePhoneNumber()),
-		Username:    strToPtr(username),
-	})
-	if err != nil {
-		t.Error(err)
+	type arg struct {
+		ctx  context.Context
+		body client.UserCreateUserJSONRequestBody
+	}
+	tests := []struct {
+		name         string
+		arg          arg
+		wantHttpCode int
+		wantMessage  string
+	}{
+		{
+			name: "when input valid, it should return 200",
+			arg: arg{
+				ctx: context.Background(),
+				body: client.UserCreateUserJSONRequestBody{
+					Gender:      strToPtr("male"),
+					Name:        strToPtr(faker.Name()),
+					Password:    strToPtr(password),
+					PhoneNumber: strToPtr(generatePhoneNumber()),
+					Username:    strToPtr(username),
+				},
+			},
+			wantHttpCode: http.StatusOK,
+			wantMessage:  "id",
+		},
+		{
+			name: "when input valid but previous username already registered, it should return 409",
+			arg: arg{
+				ctx: context.Background(),
+				body: client.UserCreateUserJSONRequestBody{
+					Gender:      strToPtr("male"),
+					Name:        strToPtr(faker.Name()),
+					Password:    strToPtr(password),
+					PhoneNumber: strToPtr(generatePhoneNumber()),
+					Username:    strToPtr(username),
+				},
+			},
+			wantHttpCode: http.StatusConflict,
+			wantMessage:  "DuplicateResource",
+		},
+		{
+			name: "when phone not valid, it should return 400",
+			arg: arg{
+				ctx: context.Background(),
+				body: client.UserCreateUserJSONRequestBody{
+					Gender:      strToPtr("male"),
+					Name:        strToPtr(faker.Name()),
+					Password:    strToPtr(password),
+					PhoneNumber: strToPtr(faker.Phonenumber()),
+					Username:    strToPtr(generateUsername(10)),
+				},
+			},
+			wantHttpCode: http.StatusBadRequest,
+			wantMessage:  "phoneNumber",
+		},
+		{
+			name: "when password not valid, it should return 400",
+			arg: arg{
+				ctx: context.Background(),
+				body: client.UserCreateUserJSONRequestBody{
+					Gender:      strToPtr("male"),
+					Name:        strToPtr(faker.Name()),
+					Password:    strToPtr(faker.Password()),
+					PhoneNumber: strToPtr(generatePhoneNumber()),
+					Username:    strToPtr(generateUsername(10)),
+				},
+			},
+			wantHttpCode: http.StatusBadRequest,
+			wantMessage:  "password",
+		},
+		{
+			name: "when username not valid, it should return 400",
+			arg: arg{
+				ctx: context.Background(),
+				body: client.UserCreateUserJSONRequestBody{
+					Gender:      strToPtr("male"),
+					Name:        strToPtr(faker.Name()),
+					Password:    strToPtr(generatePassword(15)),
+					PhoneNumber: strToPtr(generatePhoneNumber()),
+					Username:    strToPtr("asd123@13#"),
+				},
+			},
+			wantHttpCode: http.StatusBadRequest,
+			wantMessage:  "username",
+		},
+		{
+			name: "when gender not valid, it should return 400",
+			arg: arg{
+				ctx: context.Background(),
+				body: client.UserCreateUserJSONRequestBody{
+					Gender:      strToPtr("asdqwe"),
+					Name:        strToPtr(faker.Name()),
+					Password:    strToPtr(generatePassword(15)),
+					PhoneNumber: strToPtr(generatePhoneNumber()),
+					Username:    strToPtr(generateUsername(12)),
+				},
+			},
+			wantHttpCode: http.StatusBadRequest,
+			wantMessage:  "gender",
+		},
+		{
+			name: "when name not valid, it should return 400",
+			arg: arg{
+				ctx: context.Background(),
+				body: client.UserCreateUserJSONRequestBody{
+					Gender:      strToPtr("asdqwe"),
+					Name:        strToPtr("as"),
+					Password:    strToPtr(generatePassword(15)),
+					PhoneNumber: strToPtr(generatePhoneNumber()),
+					Username:    strToPtr(generateUsername(12)),
+				},
+			},
+			wantHttpCode: http.StatusBadRequest,
+			wantMessage:  "name",
+		},
+	}
+	for _, tt := range tests {
+		resp, err := openApiClient.UserCreateUser(tt.arg.ctx, tt.arg.body)
+		body, _ := io.ReadAll(resp.Body)
+
+		assert := assert.New(t)
+		assert.NoError(err)
+		assert.Equal(tt.wantHttpCode, resp.StatusCode)
+		assert.Contains(string(body), tt.wantMessage)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("Expected status code 200, got %d", resp.StatusCode)
-	}
-
-	loginParams := client.UserCreateUserTokenJSONRequestBody{
-		Password: strToPtr(password),
-		Username: strToPtr(username),
-	}
-	loginResponse, err := openApiClient.UserCreateUserToken(context.Background(), loginParams)
-	if err != nil {
-		t.Fatalf("Failed to login: %v", err)
-	}
-
-	if loginResponse.StatusCode != 200 {
-		body, _ := io.ReadAll(loginResponse.Body)
-		fmt.Println(string(body))
-		t.Errorf("Expected status code 200, got %d", loginResponse.StatusCode)
-	}
 }
 
 func generateUsername(length int) string {
