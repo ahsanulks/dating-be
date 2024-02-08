@@ -5,7 +5,6 @@ import (
 	"app/internal/user/port/driven"
 	"context"
 	"database/sql"
-	"fmt"
 )
 
 type UserRepository struct {
@@ -89,8 +88,6 @@ func (ur *UserRepository) GetByUsername(ctx context.Context, username string) (*
 	} else {
 		return nil, sql.ErrNoRows
 	}
-
-	fmt.Printf("%+v\n", user)
 
 	return &user, err
 }

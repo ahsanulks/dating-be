@@ -25,6 +25,7 @@ init:
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 	go install github.com/google/wire/cmd/wire@latest
 	go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 .PHONY: config
 # generate internal proto
@@ -70,6 +71,9 @@ test:
 	sleep 1
     # Find and kill the background process
 	kill `pgrep -f ./bin/app` || true
+
+lint:
+	golangci-lint run
 
 .PHONY: all
 # generate all

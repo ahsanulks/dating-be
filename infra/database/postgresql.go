@@ -20,7 +20,6 @@ func NewPostgresDB(c *configs.DBConfig, logger log.Logger) (*PostgresDB, func())
 		panic("cannot connect to db")
 	}
 	if err := conn.Ping(); err != nil {
-		fmt.Println(err)
 		panic("cannot ping db")
 	}
 	_ = logger.Log(log.LevelInfo, "msg", "connecting to db")
