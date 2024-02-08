@@ -19,7 +19,6 @@ COPY --from=builder /app/configs /app/configs
 COPY --from=builder /app/migrations /app/migrations
 COPY --from=builder /go/bin/goose /app/goose
 
-
 WORKDIR /app
 
 EXPOSE 8000

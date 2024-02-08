@@ -26,6 +26,7 @@ init:
 	go install github.com/google/wire/cmd/wire@latest
 	go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install github.com/cosmtrek/air@latest
 
 .PHONY: config
 # generate internal proto
