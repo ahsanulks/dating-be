@@ -29,7 +29,7 @@ func TestUserWriterUsecase_GenerateUsertoken(t *testing.T) {
 	invalidUser := &entity.User{
 		Username: "wrongUsername",
 		Name:     faker.Name(),
-		Password: faker.Password(),
+		Password: string(encryptedPassword),
 	}
 	fakeUserDriven.Create(context.Background(), invalidUser)
 
@@ -73,7 +73,7 @@ func TestUserWriterUsecase_GenerateUsertoken(t *testing.T) {
 				context.Background(),
 				&request.GenerateUserToken{
 					Username: invalidUser.Username,
-					Password: invalidUser.Password,
+					Password: validPassword,
 				},
 			},
 			want:    nil,

@@ -66,10 +66,7 @@ func TestUserApiHandler_CreateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := UserApiHandler{
-				userWriter: tt.fields.userWriter,
-				log:        tt.fields.log,
-			}
+			h := NewUserApiHandler(tt.fields.userWriter, tt.fields.log)
 			got, err := h.CreateUser(tt.args.ctx, tt.args.params)
 			assert := assert.New(t)
 			if tt.wantErr {
@@ -131,10 +128,7 @@ func TestUserApiHandler_CreateUserToken(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := UserApiHandler{
-				userWriter: tt.fields.userWriter,
-				log:        tt.fields.log,
-			}
+			h := NewUserApiHandler(tt.fields.userWriter, tt.fields.log)
 			got, err := h.CreateUserToken(tt.args.ctx, tt.args.params)
 			assert := assert.New(t)
 			if tt.wantErr {

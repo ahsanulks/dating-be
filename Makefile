@@ -66,7 +66,7 @@ test:
     # Wait a moment to ensure the binary has started
 	sleep 1
     # Run the tests
-	go test ./...
+	go test ./... -cover
 	sleep 1
     # Find and kill the background process
 	kill `pgrep -f ./bin/app` || true
